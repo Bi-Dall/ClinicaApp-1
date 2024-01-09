@@ -1,0 +1,43 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "clinica-webapp-deployment"
+  namespace: "default"
+  labels:
+    app: "clinica-webapp-deployment"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "clinica-webapp-deployment"
+  template:
+    metadata:
+      labels:
+        app: "clinica-webapp-deployment"
+    spec:
+      containers:
+      - name: "clinicaapp-1"
+        image: "gcr.io/clinica-410018/github.com/bi-dall/clinicaapp"
+---
+apiVersion: "autoscaling/v2"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "clinica-webapp-deployment-hpa-jwbg"
+  namespace: "default"
+  labels:
+    app: "clinica-webapp-deployment"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "clinica-webapp-deployment"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      target:
+        type: "Utilization"
+        averageUtilization: 80
